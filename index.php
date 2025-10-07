@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foco Total - Seu Dashboard de Produtividade</title>
+    <title>Foco Total - Produtividade Zen</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,10 @@
             <a href="#" class="logo">Foco Total</a>
             <div class="header-icons">
                 <a href="#" class="icon-btn" aria-label="Música"><i class="fas fa-music"></i></a>
-                <button id="theme-switcher-btn" class="icon-btn" aria-label="Mudar tema"><i class="fas fa-moon"></i><i class="fas fa-sun"></i></button>
+                <button id="theme-switcher-btn" class="icon-btn" aria-label="Mudar tema">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
                 <button class="icon-btn" id="general-settings-btn" aria-label="Configurações Gerais"><i class="fas fa-cog"></i></button>
                 <a href="#" class="icon-btn" aria-label="Perfil do Usuário"><i class="fas fa-user-circle"></i></a>
             </div>
@@ -35,6 +38,8 @@
         <div id="widget-options" class="widget-options-menu">
             <button class="widget-option" data-widget-type="pomodoro"><i class="fas fa-clock"></i> Pomodoro</button>
             <button class="widget-option" data-widget-type="taskList"><i class="fas fa-tasks"></i> Lista de Tarefas</button>
+            <button class="widget-option" data-widget-type="photo"><i class="fas fa-image"></i> Imagem</button>
+            <button class="widget-option" data-widget-type="music"><i class="fab fa-youtube"></i> Música</button>
         </div>
     </div>
 
