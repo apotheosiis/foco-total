@@ -60,6 +60,21 @@ try {
             throw new Exception("O nome do workspace não pode ser vazio.");
         }
 
+        // Se uma ação de renomear for enviada
+        if (isset($data['action']) && $data['action'] == 'rename' && isset($data['id'])) {
+            $id_workspace = $data['id'];
+            $sql = "UPDATE workstations SET nome = ? WHERE id = ? AND id_usuario = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sii", $nome, $id_workspace, $id_usuario);
+            if ($stmt->execute()) {
+                echo json_encode(["success" => true, "message" => "Workspace renomeado."]);
+            } else {
+                throw new Exception("Erro ao renomear workspace: " . $stmt->error);
+            }
+            $stmt->close();
+            exit;
+        }
+
         $sql = "INSERT INTO workstations (id_usuario, nome, layout_data) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
         // O tipo para a coluna JSON deve ser 's' (string).
@@ -114,6 +129,26 @@ try {
         // CORREÇÃO: O PATCH deve apenas atualizar e retornar sucesso, sem enviar dados de layout.
         // A página será recarregada e fará um GET para buscar os dados.
         echo json_encode(["success" => true, "message" => "Workspace ativado."]);
+        exit;
+    } elseif ($method == "DELETE") {
+        // Excluir um workspace
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id_workspace = $data['id'] ?? null;
+
+        if (!$id_workspace) {
+            throw new Exception("ID do workspace não fornecido para exclusão.");
+        }
+
+        $sql = "DELETE FROM workstations WHERE id = ? AND id_usuario = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $id_workspace, $id_usuario);
+
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "Workspace excluído."]);
+        } else {
+            throw new Exception("Erro ao excluir workspace: " . $stmt->error);
+        }
+        $stmt->close();
         exit;
     }
 

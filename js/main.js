@@ -28,8 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const workspaceBtn = document.getElementById('workspace-btn');
     const workspaceMenu = document.getElementById('workspace-menu');
     const workspaceList = document.getElementById('workspace-list');
-    const newWorkspaceNameInput = document.getElementById('new-workspace-name');
-    const saveNewWorkspaceBtn = document.getElementById('save-new-workspace-btn');
+    const createNewWorkspaceBtn = document.getElementById('create-new-workspace-btn');
     
     // ======================= LÓGICA DE TEMA E MODAL (ESTÁVEL) =======================
     function applyTheme(theme) {
@@ -96,24 +95,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         switch (parsedType) {
             case 'pomodoro':
-                Object.assign(gridOptions, { w: 4, h: 4, noResize: true });
+                Object.assign(gridOptions, { w: 4, h: 4, noResize: true, ...widgetData });
                 contentSelector = '.timer-card';
                 contentHTML = `<div class="timer-card">${deleteBtnHTML}<div class="mode-selector"><button class="mode-btn active" data-mode="work">Foco</button><button class="mode-btn" data-mode="short-break">Pausa Curta</button><button class="mode-btn" data-mode="long-break">Pausa Longa</button><button class="icon-btn settings-icon-btn js-open-pomodoro-settings" aria-label="Configurações do Timer"><i class="fas fa-ellipsis-v"></i></button></div><h1 class="timer-display">--:--</h1><div class="controls"><button class="start-btn btn"><i class="fas fa-play"></i> Iniciar</button><button class="pause-btn btn btn-secondary"><i class="fas fa-pause"></i> Pausar</button><button class="reset-btn btn btn-secondary"><i class="fas fa-redo-alt"></i> Reiniciar</button></div></div>`;
                 break;
             case 'taskList':
-                Object.assign(gridOptions, { w: 5, h: 4, minH: 4, auto: true });
+                Object.assign(gridOptions, { w: 5, h: 4, minH: 4, auto: true, ...widgetData });
                 contentSelector = '.task-section';
                 contentHTML = `<div class="task-section">${deleteBtnHTML}<h2>Minhas Tarefas</h2><div class="task-input-group"><input type="text" class="new-task-input" placeholder="Adicionar nova tarefa..."><button class="add-task-btn btn btn-add"><i class="fas fa-plus"></i></button></div><div class="task-list-container"><ul class="task-list"></ul></div><button class="clear-btn btn btn-secondary" style="display: none;"><i class="fas fa-trash-alt"></i> Limpar Concluídas</button></div>`;
                 break;
             case 'music':
-                Object.assign(gridOptions, { w: 6, h: 4, minH: 4 }); // minW?
+                Object.assign(gridOptions, { w: 6, h: 4, minH: 4, ...widgetData });
                 contentSelector = '.music-section';
                 const videoId = widgetData.content;
                 const musicBody = videoId ? `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` : `<div class="music-input-container"><h3>Player de Música</h3><input type="text" class="music-url-input" placeholder="Cole a URL do YouTube aqui..."><button class="music-save-btn btn">Carregar</button></div>`;
                 contentHTML = `<div class="music-section">${deleteBtnHTML}${musicBody}</div>`;
                 break;
             case 'photo':
-                Object.assign(gridOptions, { w: 4, h: 4, minH: 3 });
+                Object.assign(gridOptions, { w: 4, h: 4, minH: 3, ...widgetData });
                 contentSelector = '.photo-section';
                 const bgImage = widgetData.content ? `style="background-image: url(${widgetData.content})"` : '';
                 contentHTML = `<div class="photo-section" ${bgImage}>${deleteBtnHTML}<input type="file" class="photo-input" accept="image/*" />${!widgetData.content ? '<div class="photo-placeholder"><i class="fas fa-plus"></i><span>Adicionar Imagem</span></div>' : ''}</div>`;
@@ -244,7 +243,8 @@ document.addEventListener('DOMContentLoaded', function () {
         addTaskBtn.addEventListener('click', addTask);
         newTaskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
         taskList.addEventListener('click', handleTaskClick);
-        clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+        // CORREÇÃO: Adicionar verificação para garantir que o botão existe antes de adicionar o evento.
+        if (clearCompletedBtn) clearCompletedBtn.addEventListener('click', clearCompletedTasks);
         renderTasks();
     }
     
@@ -444,9 +444,91 @@ document.addEventListener('DOMContentLoaded', function () {
         workspaces.forEach(ws => {
             const li = document.createElement('li');
             li.textContent = ws.nome;
+            li.innerHTML = `
+                <span class="ws-name">${ws.nome}</span>
+                <div class="ws-actions">
+                    <button class="ws-action-btn rename-ws-btn" aria-label="Renomear"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="ws-action-btn delete-ws-btn" aria-label="Excluir"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            `;
             li.dataset.id = ws.id;
-            if (ws.id == activeWorkspaceId) li.style.fontWeight = 'bold'; // Usar '==' para comparar string com número se necessário
-            li.addEventListener('click', () => loadWorkspace(ws.id));
+
+            const nameSpan = li.querySelector('.ws-name');
+
+            // CORREÇÃO: Restaurar a lógica que exibe o título do workspace ativo
+            if (ws.id == activeWorkspaceId) {
+                nameSpan.style.fontWeight = 'bold';
+                const currentWorkspaceTitle = document.getElementById('current-workspace-title');
+                if(currentWorkspaceTitle) currentWorkspaceTitle.textContent = ws.nome;
+            }
+
+            nameSpan.addEventListener('click', () => loadWorkspace(ws.id));
+
+            // Lógica para Renomear
+            li.querySelector('.rename-ws-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const currentName = nameSpan.textContent.trim();
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'ws-name-input';
+                input.value = currentName;
+
+                // Substitui o span pelo input
+                nameSpan.replaceWith(input);
+                input.focus();
+                input.select();
+
+                const saveName = async () => {
+                    const newName = input.value.trim();
+                    let finalName = currentName; // Nome para reverter em caso de falha
+
+                    if (newName && newName !== currentName) {
+                        try {
+                            const response = await fetch('api_workspace.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ action: 'rename', id: ws.id, nome: newName }),
+                            });
+                            if (response.ok) {
+                                finalName = newName; // Sucesso, usa o novo nome
+                            } else { throw new Error('Falha ao renomear.'); }
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+
+                    // Cria um novo span e o substitui de volta
+                    const newNameSpan = document.createElement('span');
+                    newNameSpan.className = 'ws-name';
+                    newNameSpan.textContent = finalName;
+                    if (ws.id == activeWorkspaceId) newNameSpan.style.fontWeight = 'bold';
+                    newNameSpan.addEventListener('click', () => loadWorkspace(ws.id));
+                    input.replaceWith(newNameSpan);
+                };
+
+                input.addEventListener('blur', saveName);
+                input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') input.blur(); });
+            });
+
+            // Lógica para Excluir
+            li.querySelector('.delete-ws-btn').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (confirm(`Tem certeza que deseja excluir o workspace "${ws.nome}"? Esta ação não pode ser desfeita.`)) {
+                    try {
+                        const response = await fetch('api_workspace.php', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: ws.id })
+                        });
+                        if (response.ok) {
+                            li.remove();
+                            // Se o workspace ativo for excluído, recarrega a página para carregar o próximo mais recente.
+                            if (ws.id == activeWorkspaceId) window.location.reload();
+                        } else { throw new Error('Falha ao excluir.'); }
+                    } catch (err) { console.error(err); alert('Não foi possível excluir o workspace.'); }
+                }
+            });
+
             workspaceList.appendChild(li);
         });
     }
@@ -487,32 +569,24 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('click', (e) => {
             if (!workspaceMenu.contains(e.target)) workspaceMenu.style.display = 'none';
         });
-        saveNewWorkspaceBtn.addEventListener('click', async () => {
-            const name = newWorkspaceNameInput.value.trim();
-            if (!name) return alert('Por favor, dê um nome ao workspace.');
 
-            // CORREÇÃO: Adicionado bloco try...catch para capturar e exibir erros.
-            try {
-                const layoutData = JSON.stringify(getDashboardData());
+        createNewWorkspaceBtn.addEventListener('click', async () => {
+            const name = prompt("Digite o nome para o novo workspace:", "Novo Workspace");
+            if (!name || name.trim() === '') return;
 
-                const response = await fetch('api_workspace.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome: name, layout_data: layoutData })
-                });
+            const response = await fetch('api_workspace.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: name.trim(),
+                    layout_data: '[]' // Cria um workspace vazio
+                })
+            });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `Erro do servidor: ${response.statusText}`);
-                }
-
-                const newWorkspace = await response.json();
-                // CORREÇÃO: Após criar, simplesmente recarrega a página para ativá-lo.
+            if (response.ok) {
+                // Recarrega a página para que o novo workspace seja ativado
                 window.location.reload();
-            } catch (error) {
-                console.error("Falha ao salvar novo workspace:", error);
-                alert(`Não foi possível salvar o workspace: ${error.message}`);
-            }
+            } else { alert('Não foi possível criar o workspace.'); }
         });
 
         document.addEventListener('keydown', (event) => {

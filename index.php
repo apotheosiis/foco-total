@@ -41,9 +41,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
                     <div id="workspace-menu" class="workspace-menu">
                         <div class="workspace-list-header">Meus Workspaces</div>
                         <ul id="workspace-list"></ul>
-                        <div class="workspace-save-new">
-                            <input type="text" id="new-workspace-name" placeholder="Nome do novo Workspace...">
-                            <button id="save-new-workspace-btn" class="btn">Salvar Novo</button>
+                        <div class="workspace-actions">
+                            <button id="create-new-workspace-btn" class="btn-subtle"><i class="fas fa-plus"></i> Criar Novo Workspace</button>
                         </div>
                     </div>
                 </div>
