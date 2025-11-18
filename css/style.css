@@ -22,6 +22,29 @@ body { background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg
 body:not(.dark-mode) #theme-switcher-btn .fa-moon { display: inline-block; }
 body.dark-mode #theme-switcher-btn .fa-sun { display: inline-block; }
 body.dark-mode #theme-switcher-btn .fa-moon { display: none; }
+
+.workspace-menu-container { position: relative; }
+.workspace-menu {
+    display: none;
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 25px var(--shadow-color);
+    width: 280px;
+    z-index: 20;
+    overflow: hidden;
+}
+.workspace-list-header { padding: 12px 15px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+#workspace-list { list-style: none; max-height: 200px; overflow-y: auto; }
+#workspace-list li { padding: 12px 15px; cursor: pointer; transition: background-color 0.2s ease; }
+#workspace-list li:hover { background-color: var(--bg-gradient-start); }
+body.dark-mode #workspace-list li:hover { background-color: #4B5563; }
+.workspace-save-new { padding: 15px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; }
+#new-workspace-name { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--bg-gradient-start); }
+#save-new-workspace-btn { width: 100%; }
+
 .add-widget-container { text-align: center; margin: 10px auto 20px; position: relative; z-index: 10; }
 .widget-options-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background-color: var(--bg-card); border-radius: var(--border-radius); box-shadow: 0 8px 25px var(--shadow-color); padding: 10px; margin-top: 10px; display: none; flex-direction: column; gap: 8px; width: 220px; z-index: 11; }
 .widget-option { background: none; border: none; color: var(--text-dark); padding: 10px; border-radius: 6px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background-color 0.2s ease; font-size: 1rem; font-family: var(--font-family); }

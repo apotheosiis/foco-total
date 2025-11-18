@@ -1,4 +1,13 @@
-<!DOCTYPE html>
+<?php
+// Inicializa a sessão
+session_start();
+ 
+// Verifica se o usuário está logado, se não, redireciona para a página de login
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php");
+    exit;
+}
+?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -27,8 +36,22 @@
                     <i class="fas fa-moon"></i>
                     <i class="fas fa-sun"></i>
                 </button>
-                <button class="icon-btn" id="general-settings-btn" aria-label="Configurações Gerais"><i class="fas fa-cog"></i></button>
-                <a href="#" class="icon-btn" aria-label="Perfil do Usuário"><i class="fas fa-user-circle"></i></a>
+                <div class="workspace-menu-container">
+                    <button id="workspace-btn" class="icon-btn" aria-label="Workspaces"><i class="fas fa-layer-group"></i></button>
+                    <div id="workspace-menu" class="workspace-menu">
+                        <div class="workspace-list-header">Meus Workspaces</div>
+                        <ul id="workspace-list"></ul>
+                        <div class="workspace-save-new">
+                            <input type="text" id="new-workspace-name" placeholder="Nome do novo Workspace...">
+                            <button id="save-new-workspace-btn" class="btn">Salvar Novo</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="icon-btn" id="general-settings-btn" aria-label="Configurações Gerais"><i class="fas fa-cog"></i></button>                
+                <div class="user-menu">
+                    <span class="user-name"><?php echo htmlspecialchars($_SESSION["nome"]); ?></span>
+                    <a href="logout.php" class="icon-btn" aria-label="Sair"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
             </div>
         </nav>
     </header>
