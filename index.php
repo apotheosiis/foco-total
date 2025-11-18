@@ -55,6 +55,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         </nav>
     </header>
 
+    <h1 id="current-workspace-title" class="main-title"></h1>
+
     <div class="add-widget-container">
         <button id="add-widget-btn" class="btn"><i class="fas fa-plus"></i> Adicionar Bloco</button>
         <div id="widget-options" class="widget-options-menu">

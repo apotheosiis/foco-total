@@ -11,34 +11,37 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 <head>
     <meta charset="UTF-8">
     <title>Login - Foco Total</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .auth-container { background: var(--background-color-light); padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        .auth-container h2 { text-align: center; margin-bottom: 20px; color: var(--text-color-primary); }
-        .auth-container .input-field { margin-bottom: 15px; }
-        .auth-container .input-field label { display: block; margin-bottom: 5px; }
-        .auth-container .input-field input { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; }
-        .auth-container .btn { width: 100%; padding: 12px; }
-        .auth-container .link { text-align: center; margin-top: 15px; }
-        .auth-container .link a { color: var(--primary-color); text-decoration: none; }
+        /* CORREÇÃO: Adiciona o estilo para centralizar o conteúdo na tela */
+        body.auth-body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; }
     </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="auth-body">
+    <div class="auth-logo">
+        <a href="#">Foco Total</a>
+    </div>
     <div class="auth-container">
-        <h2>Login</h2>
-        <p>Por favor, insira suas credenciais para entrar.</p>
+        <h2>Bem-vindo de volta!</h2>
+        <p class="auth-subtitle">Insira suas credenciais para acessar seu workspace.</p>
         <form action="login_action.php" method="post">
             <div class="input-field">
-                <label for="email">Email</label>
+                <i class="fas fa-envelope"></i>
                 <input type="email" name="email" id="email" required>
+                <label for="email">Seu email</label>
             </div>
             <div class="input-field">
-                <label for="senha">Senha</label>
+                <i class="fas fa-lock"></i>
                 <input type="password" name="senha" id="senha" required>
+                <label for="senha">Sua senha</label>
             </div>
-            <button type="submit" class="btn">Entrar</button>
-            <p class="link">Não tem uma conta? <a href="register.php">Cadastre-se</a>.</p>
+            <button type="submit" class="btn auth-btn">Entrar no Foco Total</button>
+            <p class="auth-link">Não tem uma conta? <a href="register.php">Cadastre-se</a></p>
         </form>
     </div>
 </body>

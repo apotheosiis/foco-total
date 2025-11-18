@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // CORREÇÃO DEFINITIVA: O 'type' vem do 'id' do widget.
         const parsedType = widgetData.id ? widgetData.id.split('-')[0] : type;
-        let gridOptions = { ...widgetData, id: widgetData.id || `${type}-${Date.now()}` };
+        let gridOptions = { ...widgetData, id: widgetData.id || `${parsedType}-${Date.now()}` };
 
         switch (parsedType) {
             case 'pomodoro':
