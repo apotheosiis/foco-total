@@ -2,8 +2,12 @@
 session_start();
 // Se o usuário já estiver logado, redireciona para a página principal
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: /foco-total/index.php");
+    header("location: /foco-total/dashboard.php");
     exit;
+}
+if (isset($_SESSION['login_error'])) {
+    $login_error = $_SESSION['login_error'];
+    unset($_SESSION['login_error']); // Limpa o erro para não mostrar de novo
 }
 ?>
 <!DOCTYPE html>
@@ -24,11 +28,18 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 </head>
 <body class="auth-body">
     <div class="auth-logo">
-        <a href="#">Foco Total</a>
+        <a href="index.php">Foco Total</a>
     </div>
     <div class="auth-container">
         <h2>Bem-vindo de volta!</h2>
         <p class="auth-subtitle">Insira suas credenciais para acessar seu workspace.</p>
+        
+        <?php if (!empty($login_error)): ?>
+            <div class="auth-error-message">
+                <?php echo htmlspecialchars($login_error); ?>
+            </div>
+        <?php endif; ?>
+
         <form action="login_action.php" method="post">
             <div class="input-field">
                 <i class="fas fa-envelope"></i>

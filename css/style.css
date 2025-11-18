@@ -162,6 +162,16 @@ body.dark-mode .widget-option:hover { background-color: #4B5563; }
     color: var(--text-light);
     margin-bottom: 30px;
 }
+.auth-error-message {
+    background-color: #f8d7da; /* Vermelho claro */
+    color: #721c24; /* Vermelho escuro */
+    border: 1px solid #f5c6cb; /* Borda vermelha */
+    padding: 12px 15px;
+    border-radius: 8px; /* Bordas arredondadas */
+    margin-bottom: 20px; /* Espaço abaixo da mensagem */
+    text-align: center;
+    font-size: 0.9rem;
+}
 .auth-container .input-field {
     position: relative;
     margin-bottom: 20px;

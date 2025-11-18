@@ -24,23 +24,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($stmt->fetch()) {
                     if (password_verify($senha, $hashed_senha)) {
                         // Senha correta, inicia a sessão
-                        session_start();
+                        // session_start() já foi chamado no topo
 
                         $_SESSION["loggedin"] = true;
                         $_SESSION["id"] = $id;
                         $_SESSION["nome"] = $nome;
 
                         // Redireciona para a página principal
-                        header("location: /foco-total/index.php");
+                        header("location: /foco-total/dashboard.php");
+                        exit; // É importante adicionar exit após o redirecionamento
                     } else {
-                        echo "A senha que você digitou não é válida.";
+                        // Senha incorreta. Define a mensagem de erro e redireciona de volta.
+                        $_SESSION['login_error'] = "Email ou senha inválidos.";
+                        header("location: login.php");
+                        exit;
                     }
                 }
             } else {
-                echo "Nenhuma conta encontrada com esse email.";
+                // Usuário não encontrado. Define a mensagem de erro e redireciona.
+                $_SESSION['login_error'] = "Email ou senha inválidos.";
+                header("location: login.php");
+                exit;
             }
         } else {
-            echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+            $_SESSION['login_error'] = "Ops! Algo deu errado. Tente novamente.";
+            header("location: login.php");
+            exit;
         }
         $stmt->close();
     }

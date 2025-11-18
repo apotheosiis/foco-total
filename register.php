@@ -16,7 +16,7 @@
 </head>
 <body class="auth-body">
     <div class="auth-logo">
-        <a href="#">Foco Total</a>
+        <a href="index.php">Foco Total</a>
     </div>
     <div class="auth-container">
         <h2>Crie sua conta</h2>
