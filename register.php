@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (isset($_SESSION['register_error'])) {
+    $register_error = $_SESSION['register_error'];
+    unset($_SESSION['register_error']); // Limpa o erro para não mostrar de novo
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -21,6 +28,13 @@
     <div class="auth-container">
         <h2>Crie sua conta</h2>
         <p class="auth-subtitle">Comece sua jornada de produtividade e foco.</p>
+
+        <?php if (!empty($register_error)): ?>
+            <div class="auth-error-message">
+                <?php echo htmlspecialchars($register_error); ?>
+            </div>
+        <?php endif; ?>
+
         <form action="register_action.php" method="post">
             <div class="input-field">
                 <i class="fas fa-user"></i>

@@ -26,8 +26,12 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 
+    <!-- Vanilla Calendar -->
+    <!-- CORREÇÃO: Carrega o script do calendário primeiro, sem 'defer' -->
+    <link href="css/vanilla-calendar.min.css" rel="stylesheet">
+    <script src="js/vanilla-calendar.min.js"></script>
+
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/main.js" defer></script>
 </head>
 <body>
 
@@ -35,7 +39,6 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         <nav class="nav-container">
             <a href="#" class="logo">Foco Total</a>
             <div class="header-icons">
-                <a href="#" class="icon-btn" aria-label="Música"><i class="fas fa-music"></i></a>
                 <button id="theme-switcher-btn" class="icon-btn" aria-label="Mudar tema">
                     <i class="fas fa-moon"></i>
                     <i class="fas fa-sun"></i>
@@ -50,7 +53,6 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
                         </div>
                     </div>
                 </div>
-                <button class="icon-btn" id="general-settings-btn" aria-label="Configurações Gerais"><i class="fas fa-cog"></i></button>                
                 <div class="user-menu">
                     <span class="user-name"><?php echo htmlspecialchars($_SESSION["nome"]); ?></span>
                     <a href="logout.php" class="icon-btn" aria-label="Sair"><i class="fas fa-sign-out-alt"></i></a>
@@ -69,6 +71,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             <button class="widget-option" data-widget-type="photo"><i class="fas fa-image"></i> Imagem</button>
             <button class="widget-option" data-widget-type="music"><i class="fab fa-youtube"></i> Música</button>
             <button class="widget-option" data-widget-type="textBlock"><i class="fas fa-file-alt"></i> Bloco de Texto</button>
+            <button class="widget-option" data-widget-type="calendar"><i class="fas fa-calendar-alt"></i> Calendário</button>
         </div>
     </div>
 
@@ -107,5 +110,14 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             <div class="modal-footer"><button id="save-settings-btn" class="btn">Salvar</button></div>
         </div>
     </div>
+
+    <!-- Contêiner oculto para abrigar a instância única do calendário -->
+    <div id="calendar-storage" style="display: none;">
+        <div id="vanilla-calendar-element"></div>
+    </div>
+
+    <!-- Movemos o script principal para o final para garantir que tudo esteja carregado -->
+    <!-- CORREÇÃO: Carrega o script principal no final, com 'defer' para aguardar o DOM -->
+    <script src="js/main.js" defer></script>
 </body>
 </html>

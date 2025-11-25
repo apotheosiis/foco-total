@@ -1,14 +1,17 @@
 <?php
+session_start(); // Inicia a sessão para podermos usar variáveis de sessão
 require_once "db_connect.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = trim($_POST["nome"]);
     $email = trim($_POST["email"]);
     $senha = trim($_POST["senha"]);
-
+    
     // Validação simples
     if (empty($nome) || empty($email) || empty($senha)) {
-        die("Por favor, preencha todos os campos.");
+        $_SESSION['register_error'] = "Por favor, preencha todos os campos.";
+        header("location: register.php");
+        exit;
     }
 
     // Criptografa a senha
@@ -31,10 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             // Verifica se o erro é de email duplicado
             if ($conn->errno == 1062) {
-                die("Erro: Este email já está cadastrado.");
+                $_SESSION['register_error'] = "Erro: Este email já está cadastrado.";
             } else {
-                die("Ops! Algo deu errado. Por favor, tente novamente mais tarde.");
+                $_SESSION['register_error'] = "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
             }
+            header("location: register.php");
+            exit;
         }
         $stmt->close();
     }

@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const settingsModal = document.getElementById('settings-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const saveSettingsBtn = document.getElementById('save-settings-btn');
-    const generalSettingsBtn = document.getElementById('general-settings-btn');
     const addWidgetBtn = document.getElementById('add-widget-btn');
     const widgetOptionsMenu = document.getElementById('widget-options');
     const focoDurationInput = document.getElementById('foco-duration');
@@ -679,10 +678,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Lógica do Menu de Workspace
         workspaceBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const isVisible = workspaceMenu.style.display === 'block';
-            workspaceMenu.style.display = isVisible ? 'none' : 'block';
-            if (!isVisible) populateWorkspaceMenu();
+            workspaceMenu.style.display = workspaceMenu.style.display === 'block' ? 'none' : 'block';
+            if (workspaceMenu.style.display === 'block') populateWorkspaceMenu();
         });
+
         document.addEventListener('click', (e) => {
             if (!workspaceMenu.contains(e.target)) workspaceMenu.style.display = 'none';
         });
