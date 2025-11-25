@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const widgetState = new Map();
     let activeWorkspaceId = null;
+    let isAudioPrimed = false; // Flag para controlar o desbloqueio do áudio
     let globalSettings = {};
 
     // ======================= SELETORES GLOBAIS =======================
@@ -28,6 +29,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const workspaceMenu = document.getElementById('workspace-menu');
     const workspaceList = document.getElementById('workspace-list');
     const createNewWorkspaceBtn = document.getElementById('create-new-workspace-btn');
+    const volumeSlider = document.getElementById('volume-slider');
+    const testVolumeBtn = document.getElementById('test-volume-btn');
     
     // ======================= LÓGICA DE TEMA E MODAL (ESTÁVEL) =======================
     function applyTheme(theme) {
@@ -59,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
         globalSettings.shortBreak = parseInt(shortBreakDurationInput.value, 10) || 5;
         globalSettings.longBreak = parseInt(longBreakDurationInput.value, 10) || 30;
         globalSettings.longBreakInterval = parseInt(longBreakIntervalInput.value, 10) || 4;
+        globalSettings.volume = parseFloat(volumeSlider.value) || 0.5;
         localStorage.setItem('focoTotalSettings', JSON.stringify(globalSettings));
         alert('Configurações salvas!');
         closeModal();
@@ -73,11 +77,46 @@ document.addEventListener('DOMContentLoaded', function () {
             shortBreak: savedSettings.shortBreak || 5,
             longBreak: savedSettings.longBreak || 30,
             longBreakInterval: savedSettings.longBreakInterval || 4,
+            volume: savedSettings.volume !== undefined ? savedSettings.volume : 0.5,
         };
         focoDurationInput.value = globalSettings.foco;
         shortBreakDurationInput.value = globalSettings.shortBreak;
         longBreakDurationInput.value = globalSettings.longBreak;
         longBreakIntervalInput.value = globalSettings.longBreakInterval;
+        volumeSlider.value = globalSettings.volume;
+    }
+
+    // ======================= LÓGICA DE ÁUDIO =======================
+    const sounds = {
+        focoEnd: new Audio('audio/foco_end.mp3'),
+        breakEnd: new Audio('audio/break_end.mp3'),
+        longBreakEnd: new Audio('audio/long_break_end.mp3')
+    };
+    function playSound(soundName) {
+        const sound = sounds[soundName];
+        if (sound) { 
+            sound.volume = globalSettings.volume; 
+            sound.currentTime = 0; // Rebobina o som para o início
+            sound.play(); 
+        }
+    }
+
+    /**
+     * Desbloqueia a permissão de áudio do navegador.
+     * Os navegadores modernos exigem uma interação do usuário para tocar som.
+     * Esta função é chamada na primeira vez que o usuário clica em "Iniciar".
+     */
+    function primeAudio() {
+        if (isAudioPrimed) return;
+
+        // Tenta tocar cada som com volume 0 para "desbloquear"
+        Object.values(sounds).forEach(sound => {
+            sound.volume = 0;
+            sound.play().catch(e => console.error("Audio priming failed", e)); // O catch evita erros no console se falhar
+            sound.pause();
+            sound.currentTime = 0;
+        });
+        isAudioPrimed = true;
     }
 
     // ======================= LÓGICA DO DASHBOARD =======================
@@ -221,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         function startTimer() {
             if (timerInterval) return;
+            primeAudio(); // Desbloqueia o áudio no primeiro clique em "Iniciar"
             if (timeLeft <= 0) switchMode(currentMode); // Garante que o tempo seja resetado se estiver em 0
             timerInterval = setInterval(() => {
                 timeLeft--; updateDisplay();
@@ -235,9 +275,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         state.count++; // Atualiza o estado
                         pomodoroCount++;
-                        if (pomodoroCount > 0 && pomodoroCount % globalSettings.longBreakInterval === 0) { switchMode('long-break'); } 
-                        else { switchMode('short-break'); }
-                    } else { switchMode('work'); } // Volta ao trabalho após uma pausa
+                        if (pomodoroCount > 0 && pomodoroCount % globalSettings.longBreakInterval === 0) {
+                            playSound('longBreakEnd');
+                            switchMode('long-break'); 
+                        } else { 
+                            playSound('focoEnd');
+                            switchMode('short-break'); 
+                        }
+                    } else { playSound('breakEnd'); switchMode('work'); } // Volta ao trabalho após uma pausa
                 }
             }, 1000);
         }
@@ -756,6 +801,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (themeSwitcherBtn) themeSwitcherBtn.addEventListener('click', toggleTheme);
         if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
         if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveGlobalSettings);
+        if (testVolumeBtn) testVolumeBtn.addEventListener('click', () => { globalSettings.volume = volumeSlider.value; playSound('focoEnd'); });
         if (settingsModal) settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeModal(); });
         
         if (addWidgetBtn) {

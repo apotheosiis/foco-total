@@ -100,6 +100,14 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
                 <div class="settings-group">
                     <div class="input-field"><label for="long-break-interval">Pomodoros para Pausa Longa</label><input type="number" id="long-break-interval" min="1"></div>
                 </div>
+                <h4><i class="fas fa-volume-up"></i> Som</h4>
+                <div class="settings-group">
+                    <div class="input-field volume-control">
+                        <label for="volume-slider">Volume</label>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.1">
+                    </div>
+                    <button id="test-volume-btn" class="btn btn-secondary">Testar</button>
+                </div>
             </div>
             <div class="modal-footer"><button id="save-settings-btn" class="btn">Salvar</button></div>
         </div>
