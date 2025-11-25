@@ -102,7 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'taskList':
                 Object.assign(gridOptions, { w: 5, h: 4, minH: 4, auto: true, ...widgetData });
                 contentSelector = '.task-section';
-                contentHTML = `<div class="task-section">${deleteBtnHTML}<h2>Minhas Tarefas</h2><div class="task-input-group"><input type="text" class="new-task-input" placeholder="Adicionar nova tarefa..."><button class="add-task-btn btn btn-add"><i class="fas fa-plus"></i></button></div><div class="task-list-container"><ul class="task-list"></ul></div><button class="clear-btn btn btn-secondary" style="display: none;"><i class="fas fa-trash-alt"></i> Limpar Concluídas</button></div>`;
+                const title = widgetData.title || 'Minhas Tarefas'; // Usa o título salvo ou um padrão
+                contentHTML = `<div class="task-section">${deleteBtnHTML}<h2 class="widget-title" title="Clique para editar">${title}</h2><div class="task-input-group"><input type="text" class="new-task-input" placeholder="Adicionar nova tarefa..."><button class="add-task-btn btn btn-add"><i class="fas fa-plus"></i></button></div><div class="task-list-container"><ul class="task-list"></ul></div><button class="clear-btn btn btn-secondary" style="display: none;"><i class="fas fa-trash-alt"></i> Limpar Concluídas</button></div>`;
                 break;
             case 'music':
                 Object.assign(gridOptions, { w: 6, h: 4, minH: 4, ...widgetData });
@@ -202,8 +203,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function initTaskListWidget(widgetEl, widgetData) {
         // CORREÇÃO: Garantir que as tarefas sejam carregadas a partir de widgetData.content,
         // que é onde os dados do layout são armazenados.
-        const state = { tasks: (widgetData && widgetData.content) ? widgetData.content : [] };
-        widgetState.set(widgetEl.closest('.grid-stack-item').getAttribute('gs-id'), state);
+        const state = { 
+            tasks: (widgetData && widgetData.content) ? widgetData.content : [],
+            title: widgetData.title || 'Minhas Tarefas'
+        };        widgetState.set(widgetEl.closest('.grid-stack-item').getAttribute('gs-id'), state);
         
         const newTaskInput = widgetEl.querySelector('.new-task-input');
         const addTaskBtn = widgetEl.querySelector('.add-task-btn');
@@ -211,6 +214,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const clearCompletedBtn = widgetEl.querySelector('.clear-btn'); // CORREÇÃO: O seletor estava errado.
         let taskIdCounter = state.tasks.length > 0 ? (Math.max(0, ...state.tasks.map(t => t.id)) + 1) : 1;
         
+        // --- NOVA LÓGICA DE EDIÇÃO DE TÍTULO ---
+        const titleElement = widgetEl.querySelector('.widget-title');
+
         function saveAndRender() { saveDashboard(); renderTasks(); }
         function renderTasks() {
             taskList.innerHTML = '';
@@ -246,6 +252,43 @@ document.addEventListener('DOMContentLoaded', function () {
         // CORREÇÃO: Adicionar verificação para garantir que o botão existe antes de adicionar o evento.
         if (clearCompletedBtn) clearCompletedBtn.addEventListener('click', clearCompletedTasks);
         renderTasks();
+
+        // --- EVENTOS PARA EDIÇÃO DE TÍTULO ---
+        if (titleElement) {
+            titleElement.addEventListener('click', () => {
+                const currentTitle = titleElement.textContent;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentTitle;
+                input.className = 'widget-title-input';
+
+                titleElement.replaceWith(input);
+                input.focus();
+                input.select();
+
+                const saveTitle = () => {
+                    const newTitle = input.value.trim();
+                    const finalTitle = newTitle === '' ? 'Minhas Tarefas' : newTitle;
+
+                    // Atualiza o estado do widget
+                    state.title = finalTitle;
+                    saveDashboard(); // Salva a alteração
+
+                    // Cria o novo h2 e o substitui de volta
+                    const newTitleElement = document.createElement('h2');
+                    newTitleElement.className = 'widget-title';
+                    newTitleElement.title = 'Clique para editar';
+                    newTitleElement.textContent = finalTitle;
+                    
+                    input.replaceWith(newTitleElement);
+                    // Reanexa o evento de clique ao novo elemento
+                    newTitleElement.addEventListener('click', titleElement.click);
+                };
+
+                input.addEventListener('blur', saveTitle);
+                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
+            });
+        }
     }
     
     function initPhotoWidget(widgetEl) {
@@ -254,16 +297,42 @@ document.addEventListener('DOMContentLoaded', function () {
         const photoInput = widgetEl.querySelector('.photo-input');
         const placeholder = widgetEl.querySelector('.photo-placeholder');
 
-        photoSection.addEventListener('click', (e) => { if (e.target !== photoInput) photoInput.click(); });
-        photoInput.addEventListener('change', (event) => {
+        photoSection.addEventListener('click', (e) => { 
+            // Não abre o seletor de arquivo se o botão de deletar for clicado
+            if (e.target.closest('.widget-delete-btn')) return;
+            photoInput.click(); 
+        });
+
+        photoInput.addEventListener('change', async (event) => {
             const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                photoSection.style.backgroundImage = `url(${e.target.result})`;
+
+            // Cria um objeto FormData para enviar o arquivo
+            const formData = new FormData();
+            formData.append('photo', file);
+
+            try {
+                // Mostra um feedback de carregamento (opcional, mas bom para UX)
+                if (placeholder) placeholder.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Enviando...</span>';
+
+                const response = await fetch('api_upload_image.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Erro desconhecido no servidor.');
+                }
+
+                photoSection.style.backgroundImage = `url(${result.url})`;
                 if (placeholder) placeholder.style.display = 'none';
                 saveDashboard();
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                alert(`Erro ao enviar imagem: ${error.message}`);
+                // Restaura o placeholder original em caso de erro
+                if (placeholder) placeholder.innerHTML = '<i class="fas fa-plus"></i><span>Adicionar Imagem</span>';
+            }
         });
     }
 
@@ -313,7 +382,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const state = widgetState.get(node.id);
 
             if (state !== undefined) {
-                if (type === 'taskList') data.content = state.tasks;
+                if (type === 'taskList') {
+                    data.content = state.tasks;
+                    data.title = state.title; // Salva o título
+                }
                 if (type === 'music') data.content = state.videoId;
             }
             // CORREÇÃO: A lógica da imagem deve ficar fora do 'if (state !== undefined)',
@@ -321,7 +393,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (type === 'photo') {
                 const photoSection = node.el.querySelector('.photo-section');
                 const bgImage = photoSection ? photoSection.style.backgroundImage : '';
-                if (bgImage) data.content = bgImage.slice(5, -2);
+                // Agora salvamos a URL completa, que está entre url("...")
+                if (bgImage && bgImage.startsWith('url("')) {
+                    data.content = bgImage.slice(5, -2);
+                }
             }
 
             widgetsData.push(data);
