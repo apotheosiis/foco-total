@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'pomodoro':
                 Object.assign(gridOptions, { w: 4, h: 4, noResize: true, ...widgetData });
                 contentSelector = '.timer-card';
-                contentHTML = `<div class="timer-card">${deleteBtnHTML}<div class="mode-selector"><button class="mode-btn active" data-mode="work">Foco</button><button class="mode-btn" data-mode="short-break">Pausa Curta</button><button class="mode-btn" data-mode="long-break">Pausa Longa</button><button class="icon-btn settings-icon-btn js-open-pomodoro-settings" aria-label="Configurações do Timer"><i class="fas fa-ellipsis-v"></i></button></div><h1 class="timer-display">--:--</h1><div class="controls"><button class="start-btn btn"><i class="fas fa-play"></i> Iniciar</button><button class="pause-btn btn btn-secondary"><i class="fas fa-pause"></i> Pausar</button><button class="reset-btn btn btn-secondary"><i class="fas fa-redo-alt"></i> Reiniciar</button></div></div>`;
+                contentHTML = `<div class="timer-card">${deleteBtnHTML}<div class="mode-selector"><button class="mode-btn active" data-mode="work">Foco</button><button class="mode-btn" data-mode="short-break">Pausa Curta</button><button class="mode-btn" data-mode="long-break">Pausa Longa</button><button class="icon-btn settings-icon-btn js-open-pomodoro-settings" aria-label="Configurações do Timer"><i class="fas fa-ellipsis-v"></i></button></div><h1 class="timer-display">--:--</h1><div class="pomodoro-task-focus">Nenhuma tarefa em foco</div><div class="controls"><button class="start-btn btn"><i class="fas fa-play"></i> Iniciar</button><button class="pause-btn btn btn-secondary"><i class="fas fa-pause"></i> Pausar</button><button class="reset-btn btn btn-secondary"><i class="fas fa-redo-alt"></i> Reiniciar</button></div></div>`;
                 break;
             case 'taskList':
                 Object.assign(gridOptions, { w: 5, h: 4, minH: 4, auto: true, ...widgetData });
@@ -108,7 +108,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 Object.assign(gridOptions, { w: 6, h: 4, minH: 4, ...widgetData });
                 contentSelector = '.music-section';
                 const videoId = widgetData.content;
-                const musicBody = videoId ? `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` : `<div class="music-input-container"><h3>Player de Música</h3><input type="text" class="music-url-input" placeholder="Cole a URL do YouTube aqui..."><button class="music-save-btn btn">Carregar</button></div>`;
+                let musicBody;
+                if (videoId) {
+                    musicBody = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                } else {
+                    musicBody = `
+                        <div class="music-input-container">
+                            <h3>Player de Música</h3>
+                            <div class="music-suggestions">
+                                <button class="suggestion-btn btn btn-secondary" data-videoid="jfKfPfyJRdk">🎧 Lofi Girl Radio</button>
+                                <button class="suggestion-btn btn btn-secondary" data-videoid="4xDzrJKXOOY">🚀 Synthwave Mix</button>
+                            </div>
+                            <div class="or-divider"><span>ou</span></div>
+                            <input type="text" class="music-url-input" placeholder="Cole a URL do YouTube aqui..."><button class="music-save-btn btn">Carregar</button>
+                        </div>`;
+                }
                 contentHTML = `<div class="music-section">${deleteBtnHTML}${musicBody}</div>`;
                 break;
             case 'photo':
@@ -138,10 +152,29 @@ document.addEventListener('DOMContentLoaded', function () {
     function initializeWidget(contentEl, type, widgetData, wrapperEl) {
         const id = wrapperEl.getAttribute('gs-id');
         const deleteBtn = contentEl.querySelector('.widget-delete-btn'); // este é o wrapper do grid-stack-item-content
-        if (deleteBtn) deleteBtn.addEventListener('click', () => { 
-            widgetState.delete(id); 
-            grid.removeWidget(wrapperEl); 
-        });
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', async () => {
+                // LÓGICA ESPECIAL PARA WIDGET DE FOTO
+                if (type === 'photo') {
+                    const photoSection = wrapperEl.querySelector('.photo-section');
+                    const bgImage = photoSection ? photoSection.style.backgroundImage : '';
+                    if (bgImage && bgImage.startsWith('url("')) {
+                        const imageUrl = bgImage.slice(5, -2); // Extrai a URL
+                        try {
+                            await fetch('api_upload_image.php', {
+                                method: 'DELETE',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ url: imageUrl })
+                            });
+                        } catch (error) {
+                            console.error('Falha ao tentar deletar a imagem no servidor:', error);
+                        }
+                    }
+                }
+                widgetState.delete(id);
+                grid.removeWidget(wrapperEl);
+            });
+        }
 
         if (type === 'pomodoro') { initPomodoroWidget(contentEl); } 
         else if (type === 'taskList') { initTaskListWidget(contentEl, widgetData); }
@@ -157,11 +190,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const resetBtn = widgetEl.querySelector('.reset-btn');
         const modeButtons = widgetEl.querySelectorAll('.mode-btn');
         const pomodoroSettingsBtn = widgetEl.querySelector('.js-open-pomodoro-settings');
-        let pomodoroCount = 0, currentMode = 'work', timerInterval = null, timeLeft = 0;
+        const taskFocusDisplay = widgetEl.querySelector('.pomodoro-task-focus');
+        let pomodoroCount = 0, currentMode = 'work', timerInterval = null, timeLeft = 0, linkedTaskId = null;
         
         // CORREÇÃO: Registrar um estado inicial para o widget Pomodoro.
         const state = { mode: currentMode, count: pomodoroCount };
-        widgetState.set(widgetEl.closest('.grid-stack-item').getAttribute('gs-id'), state);
+        widgetState.set(widgetEl.closest('.grid-stack-item').getAttribute('gs-id'), state); // O estado aqui é simples, não precisa salvar a tarefa
 
         function updateDisplay() {
             const minutes = Math.floor(timeLeft / 60);
@@ -173,6 +207,11 @@ document.addEventListener('DOMContentLoaded', function () {
             pauseTimer(); 
             currentMode = newMode;
             state.mode = newMode; // Atualiza o estado
+            if (newMode !== 'work') {
+                linkedTaskId = null;
+                taskFocusDisplay.textContent = 'Nenhuma tarefa em foco';
+                taskFocusDisplay.style.display = 'none';
+            } else { taskFocusDisplay.style.display = 'block'; }
 
             if (newMode === 'work') timeLeft = globalSettings.foco * 60;
             if (newMode === 'short-break') timeLeft = globalSettings.shortBreak * 60;
@@ -188,11 +227,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (timeLeft < 0) {
                     pauseTimer();
                     if (currentMode === 'work') {
+                        // Se uma tarefa estava vinculada, notifica a conclusão
+                        if (linkedTaskId) {
+                            window.dispatchEvent(new CustomEvent('pomodoroCompletedForTask', { detail: { taskId: linkedTaskId } }));
+                            linkedTaskId = null; // Desvincula a tarefa
+                            taskFocusDisplay.textContent = 'Nenhuma tarefa em foco';
+                        }
                         state.count++; // Atualiza o estado
                         pomodoroCount++;
                         if (pomodoroCount > 0 && pomodoroCount % globalSettings.longBreakInterval === 0) { switchMode('long-break'); } 
                         else { switchMode('short-break'); }
-                    } else { switchMode('work'); }
+                    } else { switchMode('work'); } // Volta ao trabalho após uma pausa
                 }
             }, 1000);
         }
@@ -202,6 +247,16 @@ document.addEventListener('DOMContentLoaded', function () {
         modeButtons.forEach(btn => btn.addEventListener('click', () => switchMode(btn.dataset.mode)));
         if(pomodoroSettingsBtn) pomodoroSettingsBtn.addEventListener('click', openModal);
         window.addEventListener('settingsUpdated', () => switchMode(currentMode));
+
+        // Ouve o evento para iniciar o foco em uma tarefa
+        window.addEventListener('startPomodoroForTask', (e) => {
+            const { taskId, taskText } = e.detail;
+            linkedTaskId = taskId;
+            taskFocusDisplay.textContent = `Foco: ${taskText}`;
+            switchMode('work');
+            startTimer();
+        });
+
         switchMode('work');
     }
 
@@ -209,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // CORREÇÃO: Garantir que as tarefas sejam carregadas a partir de widgetData.content,
         // que é onde os dados do layout são armazenados.
         const state = { 
-            tasks: (widgetData && widgetData.content) ? widgetData.content : [],
+            tasks: ((widgetData && widgetData.content) || []).map(t => ({ ...t, pomodoros: t.pomodoros || 0 })),
             title: widgetData.title || 'Minhas Tarefas'
         };        widgetState.set(widgetEl.closest('.grid-stack-item').getAttribute('gs-id'), state);
         
@@ -228,7 +283,18 @@ document.addEventListener('DOMContentLoaded', function () {
             state.tasks.forEach(task => {
                 const li = document.createElement('li');
                 li.dataset.id = task.id; li.className = `task-item ${task.completed ? 'completed' : ''}`;
-                li.innerHTML = `<div class="task-content"><span class="task-checkbox"><i class="fas fa-check"></i></span><span class="task-text">${task.text}</span></div><button class="delete-task-btn"><i class="fas fa-times"></i></button>`;
+                li.innerHTML = `
+                    <div class="task-content">
+                        <span class="task-checkbox"><i class="fas fa-check"></i></span>
+                        <span class="task-text">${task.text}</span>
+                    </div>
+                    <div class="task-actions">
+                        <span class="task-pomodoro-count" title="${task.pomodoros} pomodoros concluídos">
+                            <i class="fas fa-clock"></i> ${task.pomodoros}
+                        </span>
+                        <button class="focus-task-btn" title="Focar nesta tarefa"><i class="fas fa-crosshairs"></i></button>
+                        <button class="delete-task-btn" title="Excluir tarefa"><i class="fas fa-times"></i></button>
+                    </div>`;
                 taskList.appendChild(li);
             });
             checkClearCompletedButtonVisibility();
@@ -236,13 +302,19 @@ document.addEventListener('DOMContentLoaded', function () {
         function addTask() {
             const taskText = newTaskInput.value.trim();
             if (taskText === '') return;
-            state.tasks.push({ id: taskIdCounter++, text: taskText, completed: false });
+            state.tasks.push({ id: taskIdCounter++, text: taskText, completed: false, pomodoros: 0 });
             newTaskInput.value = ''; saveAndRender();
         }
         function handleTaskClick(e) {
             const listItem = e.target.closest('.task-item'); if (!listItem) return;
             const taskId = parseInt(listItem.dataset.id, 10);
-            if (e.target.closest('.delete-task-btn')) { state.tasks = state.tasks.filter(t => t.id !== taskId); } 
+            if (e.target.closest('.focus-task-btn')) {
+                const task = state.tasks.find(t => t.id === taskId);
+                if (task) {
+                    window.dispatchEvent(new CustomEvent('startPomodoroForTask', { detail: { taskId: task.id, taskText: task.text } }));
+                }
+            }
+            else if (e.target.closest('.delete-task-btn')) { state.tasks = state.tasks.filter(t => t.id !== taskId); } 
             else { const task = state.tasks.find(t => t.id === taskId); if (task) task.completed = !task.completed; }
             saveAndRender();
         }
@@ -256,6 +328,17 @@ document.addEventListener('DOMContentLoaded', function () {
         taskList.addEventListener('click', handleTaskClick);
         // CORREÇÃO: Adicionar verificação para garantir que o botão existe antes de adicionar o evento.
         if (clearCompletedBtn) clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+
+        // Ouve o evento de conclusão de um pomodoro
+        window.addEventListener('pomodoroCompletedForTask', (e) => {
+            const { taskId } = e.detail;
+            const task = state.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.pomodoros++;
+                saveAndRender();
+            }
+        });
+
         renderTasks();
 
         // --- EVENTOS PARA EDIÇÃO DE TÍTULO ---
@@ -346,10 +429,10 @@ document.addEventListener('DOMContentLoaded', function () {
         widgetState.set(wrapperEl.getAttribute('gs-id'), state);
         const musicSection = contentEl;
         const saveBtn = contentEl.querySelector('.music-save-btn');
+        const suggestionBtns = contentEl.querySelectorAll('.suggestion-btn');
         
-        if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
-                const urlInput = contentEl.querySelector('.music-url-input');
+        function loadVideoFromUrl() {
+            const urlInput = contentEl.querySelector('.music-url-input');
                 const url = urlInput.value;
                 const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
                 const match = url.match(regExp);
@@ -357,11 +440,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (videoId) {
                     state.videoId = videoId;
-                    const iframeHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-                    musicSection.innerHTML = `<button class="widget-delete-btn"><i class="fas fa-times"></i></button>${iframeHTML}`;
-                    musicSection.querySelector('.widget-delete-btn').addEventListener('click', () => { widgetState.delete(wrapperEl.getAttribute('gs-id')); grid.removeWidget(wrapperEl); });
-                    saveDashboard();
+                    renderPlayer(videoId);
                 } else { alert("URL do YouTube inválida!"); }
+        }
+
+        function renderPlayer(videoId) {
+            const iframeHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            musicSection.innerHTML = `<button class="widget-delete-btn"><i class="fas fa-times"></i></button>${iframeHTML}`;
+            musicSection.querySelector('.widget-delete-btn').addEventListener('click', () => { widgetState.delete(wrapperEl.getAttribute('gs-id')); grid.removeWidget(wrapperEl); });
+            saveDashboard();
+        }
+        
+        if (saveBtn) {
+            saveBtn.addEventListener('click', loadVideoFromUrl);
+        }
+
+        if (suggestionBtns) {
+            suggestionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.videoId = btn.dataset.videoid;
+                    renderPlayer(state.videoId);
+                });
             });
         }
     }

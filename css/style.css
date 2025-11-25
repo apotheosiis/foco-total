@@ -74,6 +74,14 @@ body.dark-mode .widget-option:hover { background-color: #4B5563; }
 .timer-display { font-size: clamp(3.5rem, 15vw, 6rem); font-weight: 700; margin-bottom: 20px; color: var(--primary-color); font-variant-numeric: tabular-nums; }
 .controls { display: flex; justify-content: center; gap: 12px; width: 100%; flex-wrap: wrap; }
 .controls .btn:active { transform: scale(.97); filter: brightness(.95); }
+/* Novo: Estilo para a tarefa em foco no Pomodoro */
+.pomodoro-task-focus {
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    color: var(--text-light);
+    font-style: italic;
+}
 
 .task-section h2 { text-align: center; margin-bottom: 20px; color: var(--text-dark); font-weight: 600; }
 .task-input-group { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
@@ -91,6 +99,8 @@ body.dark-mode .widget-option:hover { background-color: #4B5563; }
 .task-content { display: flex; align-items: center; flex-grow: 1; cursor: pointer; gap: 15px; }
 .task-checkbox { min-width: 20px; height: 20px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: all .2s ease; }
 .task-item.completed .task-checkbox { background-color: var(--primary-color); border-color: var(--primary-color); }
+.task-pomodoro-count { display: flex; align-items: center; gap: 5px; color: var(--text-light); font-size: 0.8rem; margin-left: auto; }
+.task-pomodoro-count i { font-size: 0.7rem; }
 .task-checkbox .fa-check {
     color: white; /* Para que o ícone seja branco contra o fundo colorido */
     font-size: 0.8rem; /* Um pouco menor para caber bem no círculo */
@@ -100,7 +110,8 @@ body.dark-mode .widget-option:hover { background-color: #4B5563; }
 .task-item.completed .task-checkbox .fa-check { opacity: 1; /* VISÍVEL quando a tarefa está completa */ }
 .task-text { word-break: break-word; }
 .task-item.completed .task-text { text-decoration: line-through; color: var(--text-light); }
-.delete-task-btn { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 1.1rem; margin-left: 10px; transition: color .2s ease; }
+.task-actions { display: flex; align-items: center; gap: 10px; }
+.delete-task-btn, .focus-task-btn { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 1.1rem; margin-left: 10px; transition: color .2s ease; }
 .clear-btn { margin-top: 15px; padding: 10px 18px; font-size: .9rem; align-self: center; }
 .widget-title-input {
     width: 80%;
@@ -120,8 +131,35 @@ body.dark-mode .widget-option:hover { background-color: #4B5563; }
 .photo-placeholder span { display: block; font-weight: 500; }
 .photo-input { display: none; }
 .music-input-container { display: flex; flex-direction: column; gap: 15px; width: 100%; text-align: center; }
+.music-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+.suggestion-btn {
+    width: 100%;
+    justify-content: center;
+}
+.or-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+.or-divider::before, .or-divider::after {
+    content: ''; flex: 1; border-bottom: 1px solid var(--border-color);
+}
+.or-divider:not(:empty)::before { margin-right: .5em; }
+.or-divider:not(:empty)::after { margin-left: .5em; }
 .music-url-input { padding: 12px 15px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 1rem; color: var(--text-dark); background-color: var(--bg-gradient-start); }
-.music-section iframe { width: 100%; height: 100%; border: none; }
+
+.music-section iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
 
 /* --- Estilos para o Bloco de Texto (Quill.js) --- */
 .text-block-section { padding: 0; align-items: stretch; }

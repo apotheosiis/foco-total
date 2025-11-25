@@ -26,11 +26,6 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 
-    <!-- Vanilla Calendar -->
-    <!-- CORREÇÃO: Carrega o script do calendário primeiro, sem 'defer' -->
-    <link href="css/vanilla-calendar.min.css" rel="stylesheet">
-    <script src="js/vanilla-calendar.min.js"></script>
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -71,7 +66,6 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             <button class="widget-option" data-widget-type="photo"><i class="fas fa-image"></i> Imagem</button>
             <button class="widget-option" data-widget-type="music"><i class="fab fa-youtube"></i> Música</button>
             <button class="widget-option" data-widget-type="textBlock"><i class="fas fa-file-alt"></i> Bloco de Texto</button>
-            <button class="widget-option" data-widget-type="calendar"><i class="fas fa-calendar-alt"></i> Calendário</button>
         </div>
     </div>
 
@@ -109,11 +103,6 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             </div>
             <div class="modal-footer"><button id="save-settings-btn" class="btn">Salvar</button></div>
         </div>
-    </div>
-
-    <!-- Contêiner oculto para abrigar a instância única do calendário -->
-    <div id="calendar-storage" style="display: none;">
-        <div id="vanilla-calendar-element"></div>
     </div>
 
     <!-- Movemos o script principal para o final para garantir que tudo esteja carregado -->
