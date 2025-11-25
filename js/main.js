@@ -118,6 +118,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const bgImage = widgetData.content ? `style="background-image: url(${widgetData.content})"` : '';
                 contentHTML = `<div class="photo-section" ${bgImage}>${deleteBtnHTML}<input type="file" class="photo-input" accept="image/*" />${!widgetData.content ? '<div class="photo-placeholder"><i class="fas fa-plus"></i><span>Adicionar Imagem</span></div>' : ''}</div>`;
                 break;
+            case 'textBlock':
+                Object.assign(gridOptions, { w: 4, h: 4, minH: 3, ...widgetData });
+                contentSelector = '.text-block-section';
+                contentHTML = `<div class="text-block-section">${deleteBtnHTML}<div class="quill-editor"></div></div>`;
+                break;
         }
 
         gridOptions.content = contentHTML;
@@ -143,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
         else if (type === 'taskList') { initTaskListWidget(contentEl, widgetData); }
         else if (type === 'music') { initMusicWidget(contentEl, widgetData, wrapperEl); }
         else if (type === 'photo') { initPhotoWidget(contentEl); }
+        else if (type === 'textBlock') { initTextBlockWidget(contentEl, widgetData, wrapperEl); }
     }
     
     function initPomodoroWidget(widgetEl) {
@@ -361,6 +367,41 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
+    function initTextBlockWidget(contentEl, widgetData, wrapperEl) {
+        const editorContainer = contentEl.querySelector('.quill-editor');
+        const state = { htmlContent: widgetData.content || '' };
+        widgetState.set(wrapperEl.getAttribute('gs-id'), state);
+
+        // Opções da barra de ferramentas do Quill
+        const toolbarOptions = [
+            ['bold', 'underline'],                         // Botões de negrito e sublinhado
+            [{ 'size': ['small', false, 'large', 'huge'] }], // Dropdown de tamanho da fonte (false = normal)
+            [{ 'color': [] }],                             // Dropdown de cores
+            ['clean']              // Botão para remover formatação
+        ];
+
+        const quill = new Quill(editorContainer, {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            placeholder: 'Comece a digitar suas anotações aqui...',
+            theme: 'snow'
+        });
+
+        // Carrega o conteúdo salvo no editor
+        if (state.htmlContent) {
+            quill.root.innerHTML = state.htmlContent;
+        }
+
+        // Salva o conteúdo sempre que o texto mudar
+        quill.on('text-change', () => {
+            // Usamos .ql-editor para pegar apenas o conteúdo, sem a barra de ferramentas
+            state.htmlContent = contentEl.querySelector('.ql-editor').innerHTML;
+            // Não chamamos saveDashboard() aqui para não sobrecarregar o servidor.
+            // O salvamento já acontece no evento 'change' do GridStack.
+        });
+    }
+
     /**
      * Coleta os dados completos do dashboard, combinando a estrutura do grid com o conteúdo dos widgets.
      * @returns {Array} Um array de objetos representando todos os widgets e seus dados.
@@ -387,6 +428,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     data.title = state.title; // Salva o título
                 }
                 if (type === 'music') data.content = state.videoId;
+                if (type === 'textBlock') data.content = state.htmlContent;
             }
             // CORREÇÃO: A lógica da imagem deve ficar fora do 'if (state !== undefined)',
             // pois ela lê os dados diretamente do DOM, não do 'widgetState'.

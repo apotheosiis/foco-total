@@ -22,6 +22,10 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     <link href="https://cdn.jsdelivr.net/npm/gridstack@10.1.2/dist/gridstack.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/gridstack@10.1.2/dist/gridstack-all.js"></script>
 
+    <!-- Quill.js - Editor de Texto -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
     <link rel="stylesheet" href="css/style.css">
     <script src="js/main.js" defer></script>
 </head>
@@ -64,6 +68,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             <button class="widget-option" data-widget-type="taskList"><i class="fas fa-tasks"></i> Lista de Tarefas</button>
             <button class="widget-option" data-widget-type="photo"><i class="fas fa-image"></i> Imagem</button>
             <button class="widget-option" data-widget-type="music"><i class="fab fa-youtube"></i> Música</button>
+            <button class="widget-option" data-widget-type="textBlock"><i class="fas fa-file-alt"></i> Bloco de Texto</button>
         </div>
     </div>
 

@@ -68,10 +68,10 @@ body.dark-mode .widget-option:hover { background-color: #4B5563; }
 .grid-stack { flex-grow: 1; width: 100%; padding: 0 10px; min-height: 50vh; }
 .grid-stack-item-content { background-color: transparent !important; box-shadow: none !important; padding: 0 !important; overflow: visible !important; }
 .widget-delete-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 1rem; opacity: 0.4; transition: opacity 0.2s ease; z-index: 5; }
-.timer-card:hover .widget-delete-btn, .task-section:hover .widget-delete-btn, .photo-section:hover .widget-delete-btn, .music-section:hover .widget-delete-btn { opacity: 1; }
+.timer-card:hover .widget-delete-btn, .task-section:hover .widget-delete-btn, .photo-section:hover .widget-delete-btn, .music-section:hover .widget-delete-btn, .text-block-section:hover .widget-delete-btn { opacity: 1; }
 .widget-delete-btn:hover { color: #ef4444; }
 
-.timer-card, .task-section, .photo-section, .music-section { display: flex; flex-direction: column; align-items: center; height: 100%; width: 100%; position: relative; padding: 30px 20px; background-color: var(--bg-card); border-radius: var(--border-radius); box-shadow: 0 8px 25px var(--shadow-color); transition: background-color .3s ease; }
+.timer-card, .task-section, .photo-section, .music-section, .text-block-section { display: flex; flex-direction: column; align-items: center; height: 100%; width: 100%; position: relative; padding: 30px 20px; background-color: var(--bg-card); border-radius: var(--border-radius); box-shadow: 0 8px 25px var(--shadow-color); transition: background-color .3s ease; }
 .timer-card, .photo-section, .music-section { justify-content: center; }
 
 .mode-selector { display: flex; align-items: center; margin-bottom: 20px; background-color: var(--bg-gradient-start); border-radius: 8px; padding: 5px; transition: background-color .3s ease; flex-wrap: wrap; justify-content: center; gap: 5px; }
@@ -130,6 +130,69 @@ body.dark-mode .widget-option:hover { background-color: #4B5563; }
 .music-input-container { display: flex; flex-direction: column; gap: 15px; width: 100%; text-align: center; }
 .music-url-input { padding: 12px 15px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 1rem; color: var(--text-dark); background-color: var(--bg-gradient-start); }
 .music-section iframe { width: 100%; height: 100%; border: none; }
+
+/* --- Estilos para o Bloco de Texto (Quill.js) --- */
+.text-block-section { padding: 0; align-items: stretch; }
+
+/* Barra de ferramentas principal */
+.text-block-section .ql-toolbar {
+    background-color: var(--bg-gradient-start);
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    padding: 8px; /* Um pouco menos de padding para um visual mais compacto */
+    transition: background-color .3s ease, border-color .3s ease;
+}
+
+/* Estilo geral para todos os botões da barra de ferramentas */
+.text-block-section .ql-toolbar .ql-formats button,
+.text-block-section .ql-toolbar .ql-picker-label {
+    height: 32px;
+    width: 32px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    color: var(--text-light);
+    border: none;
+}
+
+/* Efeito hover para os botões */
+.text-block-section .ql-toolbar .ql-formats button:hover,
+.text-block-section .ql-toolbar .ql-picker-label:hover {
+    background-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+/* Estilo para botões ATIVOS (negrito, sublinhado, etc.) */
+.text-block-section .ql-toolbar .ql-formats button.ql-active,
+.text-block-section .ql-toolbar .ql-picker-label.ql-active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Ajusta os ícones SVG dentro dos botões */
+.text-block-section .ql-toolbar .ql-stroke { stroke: var(--text-light); }
+.text-block-section .ql-toolbar button:hover .ql-stroke { stroke: var(--text-dark); }
+.text-block-section .ql-toolbar button.ql-active .ql-stroke { stroke: white; }
+
+/* Ajuste específico para o seletor de tamanho da fonte */
+.text-block-section .ql-toolbar .ql-size .ql-picker-label {
+    width: auto; /* Permite que o seletor se ajuste ao conteúdo */
+    padding: 0 8px; /* Adiciona um espaçamento interno */
+    display: flex; /* Centraliza o ícone SVG */
+    align-items: center;
+}
+/* Container do editor */
+.text-block-section .ql-container { border: none; height: calc(100% - 50px); }
+.text-block-section .ql-editor {
+    font-family: var(--font-family);
+    font-size: 1rem;
+    color: var(--text-dark);
+    height: 100%;
+    padding: 15px 20px;
+    transition: color .3s ease;
+}
+.text-block-section .ql-editor.ql-blank::before { color: var(--text-light); font-style: normal; }
 
 .btn,.btn-secondary,.btn-add,.icon-btn{-webkit-tap-highlight-color:transparent}
 .btn{border:none;border-radius:var(--border-radius);padding:12px 22px;font-size:1rem;cursor:pointer;background-color:var(--primary-color);color:white;transition:all .2s ease;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px var(--shadow-color)}.btn:hover{background-color:var(--secondary-color);transform:translateY(-2px);box-shadow:0 6px 15px var(--shadow-color)}
