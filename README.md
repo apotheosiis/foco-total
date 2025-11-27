@@ -1,22 +1,26 @@
 # 🚀 Foco Total - Dashboard de Produtividade
 
-> Um dashboard de produtividade personalizável construído com PHP, MySQL e JavaScript puro (Vanilla JS), permitindo que o usuário organize suas ferramentas de foco da maneira que preferir.
+Uma aplicação web full-stack de produtividade construída com **PHP, MySQL e JavaScript puro**. O "Foco Total" oferece um santuário digital onde os usuários podem criar e personalizar múltiplos "workspaces" com as ferramentas que precisam para se concentrar e evitar distrações.
 
 
 ---
 
 ## ✨ Funcionalidades Principais
 
-* **Dashboard Dinâmico:** Organize os blocos de ferramentas arrastando e soltando onde quiser na tela.
-* **Sistema de Widgets:** Adicione ou remova blocos (Pomodoro, Lista de Tarefas, etc.) de acordo com sua necessidade.
+* **🔐 Sistema de Contas de Usuário:** Cadastro e Login seguros para que cada usuário tenha seu próprio ambiente privado.
+* **🗂️ Gerenciamento de Workspaces:** Crie, renomeie, carregue e delete múltiplos workspaces (ex: "Trabalho", "Estudos") para diferentes contextos.
+* **💾 Persistência no Banco de Dados:** Todo o layout dos widgets, conteúdo das tarefas e configurações são salvos no **MySQL**, garantindo que seu ambiente esteja sempre como você deixou, em qualquer dispositivo.
+* **🧩 Dashboard Modular (GridStack.js):** Organize os blocos de ferramentas arrastando, soltando e redimensionando-os livremente na tela.
+* **Sistema de Widgets:**
+    * **⏰ Pomodoro Timer:** Um timer completo com modos de Foco, Pausa Curta e Pausa Longa, totalmente configurável.
+    * **📝 Lista de Tarefas (Task List):** Adicione, marque como concluído, delete tarefas e defina uma tarefa para focar durante um ciclo Pomodoro.
+    * **✍️ Bloco de Texto (Quill.js):** Um editor de texto rico para anotações rápidas, com formatação de negrito, itálico, listas e mais.
+    * **🖼️ Bloco de Imagem:** Personalize seu espaço com imagens padrão ou fazendo **upload** de seus próprios arquivos.
+    * **🎵 Bloco de Música:** Ouça playlists do YouTube com opções padrão ou colando sua própria URL de um vídeo.
 * **⏰ Pomodoro Timer:** Um timer completo com modos de Foco, Pausa Curta e Pausa Longa, totalmente configurável.
 * **📝 Lista de Tarefas (Task List):** Adicione, marque como concluído e delete tarefas.
-* **🖼️ Bloco de Imagem:** Personalize seu espaço com imagens a sua escolha.
-* **🎵 Bloco de Música:** Ouça playlists calmas do YouTube com opções padrão ou colando sua própria URL de um vídeo.
-* **🌙 Tema Claro e Escuro:** Alterne entre os modos visualmente para melhor conforto.
+* ** Tema Claro e Escuro:** Alterne entre os modos visualmente para melhor conforto.
 * **🔊 Notificação Sonora:** Um som suave avisa quando um ciclo do Pomodoro termina.
-* **Deleção Inteligente:** Remova blocos clicando no 'X' ou selecionando o bloco e apertando a tecla `Delete`.
-* **Persistência:** O layout dos blocos e o conteúdo das tarefas são salvos no navegador (`localStorage`), mantendo sua organização ao recarregar a página.
 
 ---
 
@@ -35,6 +39,7 @@ Este projeto foi construído utilizando as seguintes tecnologias:
 * **Bibliotecas:**
     * **GridStack.js:** Para a criação do dashboard dinâmico de arrastar e soltar.
     * **Font Awesome:** Para os ícones da interface.
+    * **Quill.js:** Para o widget de editor de texto rico.
 * **Ambiente de Desenvolvimento:**
     * `XAMPP` (ou similar, como WAMP/MAMP)
     * `phpMyAdmin`
@@ -47,7 +52,7 @@ Para rodar este projeto localmente, siga os passos abaixo:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone 
+    git clone https://github.com/seu-usuario/foco-total.git
     ```
 
 2.  **Ambiente Local:**
@@ -60,10 +65,10 @@ Para rodar este projeto localmente, siga os passos abaixo:
     * Selecione o banco `foco_total_db`, vá para a aba **"SQL"** e cole o conteúdo do arquivo `database.sql` para criar as tabelas.
 
 4.  **Configuração:**
-    * No arquivo `config/database.php`, verifique se as credenciais (`DB_USER`, `DB_PASS`) correspondem à configuração do seu MySQL local.
+    * No arquivo `db_connect.php` (ou `config/database.php`), verifique se as credenciais (`DB_USERNAME`, `DB_PASSWORD`) correspondem à configuração do seu MySQL local.
 
 5.  **Acesse o Projeto:**
-    * Abra seu navegador e acesse `http://localhost/[NOME_DA_PASTA_DO_PROJETO]/`.
+    * Abra seu navegador e acesse `http://localhost/foco-total/`. Você será direcionado para a landing page ou para a página de login.
 
 ---
 
@@ -77,10 +82,10 @@ O projeto está funcional com todas as funcionalidades listadas acima implementa
 
 ## 🔮 Próximos Passos (Possíveis Melhorias)
 
-* [ ] Implementar a persistência do layout e conteúdo no banco de dados com PHP/MySQL.
-* [ ] Criar um sistema de contas de usuário (Login/Cadastro).
+* [ ] Salvar as configurações de tempo do Pomodoro (durações, volume) no banco de dados por usuário.
+* [ ] Adicionar funcionalidade de "Esqueci minha senha".
 * [ ] Adicionar mais tipos de widgets (ex: Cotações, Clima, Calendário).
-* [ ] Salvar as configurações de tempo do Pomodoro por usuário.
+* [ ] Melhorar a experiência do dashboard em dispositivos móveis.
 
 ---
 
