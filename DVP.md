@@ -9,6 +9,7 @@ Este documento tem como objetivo definir a visão geral do projeto "Foco Total".
 
 ### 1.2. Escopo
 O "Foco Total" é uma aplicação web de página única (Single Page Application) projetada para ser um ambiente de produtividade personalizável. O escopo deste projeto inclui o desenvolvimento de um dashboard modular com widgets de Pomodoro, Lista de Tarefas, Imagem Motivacional e Player de Música, além de funcionalidades de customização de interface (tema claro/escuro) e persistência do layout do usuário. O projeto não contempla, inicialmente, um sistema de contas de usuário com login/senha, focando-se no armazenamento de dados localmente no navegador.
+O escopo do projeto abrange uma solução full-stack, incluindo um sistema completo de autenticação de usuários (cadastro e login), um backend em PHP que serve uma API RESTful para gerenciamento de workspaces, e um banco de dados MySQL para persistir todos os dados do usuário, como seus layouts de widgets e tarefas.
 
 ### 1.3. Visão Geral
 Este documento está organizado nas seguintes seções: Posicionamento (problema e solução), Descrição dos Stakeholders e Usuários (público-alvo), Visão Geral do Produto, e Funcionalidades do Produto.
@@ -63,7 +64,7 @@ No cenário digital atual, profissionais e estudantes são constantemente bombar
 ## 4. Visão Geral do Produto
 
 ### 4.1. Perspectiva do Produto
-O "Foco Total" é um produto independente e autocontido. Ele funciona em qualquer navegador moderno e não requer instalação. Sua funcionalidade principal depende de tecnologias front-end (HTML, CSS, JavaScript) e utiliza o `localStorage` do navegador para persistência de dados. A integração com o backend (PHP/MySQL) é planejada como uma evolução futura.
+O "Foco Total" é uma aplicação web cliente-servidor. O frontend, construído com HTML, CSS e JavaScript, é executado no navegador do usuário e se comunica com um backend robusto desenvolvido em PHP. O backend gerencia a lógica de negócios, a autenticação de usuários e a persistência de dados em um banco de dados MySQL.
 
 ### 4.2. Resumo das Capacidades
 A aplicação permitirá ao usuário:
@@ -72,6 +73,7 @@ A aplicação permitirá ao usuário:
 3.  **Organizar Tarefas:** Criar e gerenciar uma lista de afazeres.
 4.  **Personalizar o Ambiente:** Adicionar widgets de imagem e música para criar a atmosfera de trabalho desejada.
 5.  **Customizar a Interface:** Alternar entre temas claro e escuro.
+6.  **Gerenciar Conta:** Criar uma conta, fazer login e ter seus workspaces salvos de forma segura.
 
 ---
 
@@ -99,8 +101,13 @@ A aplicação permitirá ao usuário:
 * `FUNC-006`: **Sistema de Widgets:**
     * `FUNC-006.1`: Deve haver um botão central para "Adicionar Bloco".
     * `FUNC-006.2`: Cada bloco deve ter uma opção para ser excluído do dashboard.
-* `FUNC-007`: **Persistência de Dados:** O layout do dashboard e o conteúdo das tarefas/widgets devem ser salvos no `localStorage` e restaurados ao reabrir a página.
+* `FUNC-007`: **Persistência de Dados (Backend):** O layout do dashboard e todo o conteúdo dos widgets (tarefas, URLs, etc.) devem ser salvos no banco de dados MySQL, associados à conta do usuário logado. Os dados são restaurados automaticamente ao fazer login.
 * `FUNC-008`: **Tema Visual:** O usuário deve poder alternar entre um tema claro e um tema escuro.
+* `FUNC-009`: **Gerenciamento de Usuário:**
+    * `FUNC-009.1`: O sistema deve fornecer uma página de cadastro para novos usuários.
+    * `FUNC-009.2`: O sistema deve fornecer uma página de login para usuários existentes.
+    * `FUNC-009.3`: O acesso ao dashboard principal deve ser restrito apenas a usuários autenticados.
+    * `FUNC-009.4`: O sistema deve fornecer uma funcionalidade de logout segura.
 
 ---
 
