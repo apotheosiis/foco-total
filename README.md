@@ -52,7 +52,7 @@ Para rodar este projeto localmente, siga os passos abaixo:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone https://github.com/seu-usuario/foco-total.git
+    git clone https://github.com/apotheosiis/foco-total.git
     ```
 
 2.  **Ambiente Local:**
