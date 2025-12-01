@@ -80,7 +80,6 @@ O projeto está funcional com todas as funcionalidades listadas acima implementa
 
 ## 🔮 Próximos Passos (Possíveis Melhorias)
 
-* [ ] Salvar as configurações de tempo do Pomodoro (durações, volume) no banco de dados por usuário.
 * [ ] Adicionar funcionalidade de "Esqueci minha senha".
 * [ ] Adicionar mais tipos de widgets (ex: Cotações, Clima, Calendário).
 * [ ] Melhorar a experiência do dashboard em dispositivos móveis.
