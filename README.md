@@ -17,8 +17,6 @@ Uma aplicação web full-stack de produtividade construída com **PHP, MySQL e J
     * **✍️ Bloco de Texto (Quill.js):** Um editor de texto rico para anotações rápidas, com formatação de negrito, itálico, listas e mais.
     * **🖼️ Bloco de Imagem:** Personalize seu espaço com imagens padrão ou fazendo **upload** de seus próprios arquivos.
     * **🎵 Bloco de Música:** Ouça playlists do YouTube com opções padrão ou colando sua própria URL de um vídeo.
-* **⏰ Pomodoro Timer:** Um timer completo com modos de Foco, Pausa Curta e Pausa Longa, totalmente configurável.
-* **📝 Lista de Tarefas (Task List):** Adicione, marque como concluído e delete tarefas.
 * ** Tema Claro e Escuro:** Alterne entre os modos visualmente para melhor conforto.
 * **🔊 Notificação Sonora:** Um som suave avisa quando um ciclo do Pomodoro termina.
 
